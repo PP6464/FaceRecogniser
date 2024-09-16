@@ -2,7 +2,7 @@ from typing import Callable
 
 import numpy as np
 from keras import Sequential
-from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, InputLayer, Rescaling
+from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
 from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
 
@@ -115,7 +115,10 @@ model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=
 
 model.fit(train_ds, validation_data=val_ds, epochs=10)
 
-loss, acc = model.evaluate(x=np.concatenate([x.numpy() for x, _ in val_ds]), y=np.concatenate([y.numpy() for _, y in val_ds]))
+loss, acc = model.evaluate(
+    x=np.concatenate([x.numpy() for x, _ in val_ds]),
+    y=np.concatenate([y.numpy() for _, y in val_ds]),
+)
 
 print(f"Accuracy: {acc: .4f}")
 
