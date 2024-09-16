@@ -28,11 +28,11 @@ def conditional_partition(_condition: Callable, _list: list) -> tuple[list, list
     return res1, res2
 
 
-def set_me_label(image, label):
+def set_me_label(image, _):
     return image, np.array([0])
 
 
-def set_notme_label(image, label):
+def set_notme_label(image, _):
     return image, np.array([1])
 
 
