@@ -122,7 +122,10 @@ loss, acc = model.evaluate(
 
 print(f"Accuracy: {acc: .4f}")
 
-saved_loss, saved_acc = load_model("model/model.keras")
+saved_loss, saved_acc = load_model("model/model.keras").evaluate(
+    x=np.concatenate([x.numpy() for x, _ in val_ds]),
+    y=np.concatenate([y.numpy() for _, y in val_ds]),
+)
 
 if acc > saved_acc:
     model.save("model/model.keras")
