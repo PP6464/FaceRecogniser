@@ -29,17 +29,16 @@ while True:
 
     for x, y, w, h in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)  # Draw a blue rect (it is in BGR) of thickness 2
-        if frame_count == 0:
-            prediction = process_face(frame, (x, y, w, h))
-            cv2.putText(
-                frame,
-                "Me" if prediction == 0 else "Not me",
-                (x, y-10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.9,
-                (255, 255, 255),
-                2,
-            )
+        prediction = process_face(frame, (x, y, w, h))
+        cv2.putText(
+            frame,
+            "Me" if prediction == 0 else "Not me",
+            (x, y-10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.9,
+            (255, 255, 255),
+            2,
+        )
 
     cv2.imshow("Camera", frame)
 
