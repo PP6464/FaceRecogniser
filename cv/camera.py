@@ -36,7 +36,7 @@ while True:
             (x, y-10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.9,
-            (255, 255, 255),
+            (0, 255, 0) if prediction == 0 else (0, 0, 255),
             2,
         )
 
