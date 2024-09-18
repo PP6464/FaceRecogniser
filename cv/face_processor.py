@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from keras.src.saving import load_model
 
+model = load_model("../nn/model/model.keras")
+
 
 def process_face(image, face_coords) -> int:
     x, y, w, h = face_coords
@@ -11,7 +13,6 @@ def process_face(image, face_coords) -> int:
 
     face_array = np.array(face_resized)
 
-    model = load_model("../nn/model/model.keras")
     raw_prediction = model.predict(face_array[None, :, :])
 
     P_me = raw_prediction[0][0]  # Probability it is me
