@@ -49,4 +49,3 @@ while True:
 # Step 3: Release the camera and close any open windows
 cap.release()
 cv2.destroyAllWindows()
-

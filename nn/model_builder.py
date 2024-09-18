@@ -2,7 +2,7 @@ from typing import Callable
 
 import numpy as np
 from keras import Sequential
-from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
+from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
 
@@ -44,6 +44,7 @@ me_train_dataset = image_dataset_from_directory(
     validation_split=0.2,
     subset="training",
     seed=1,
+    color_mode='grayscale',
 )
 
 me_train_dataset = me_train_dataset.map(set_me_label)
@@ -56,6 +57,7 @@ me_val_dataset = image_dataset_from_directory(
     validation_split=0.2,
     subset="validation",
     seed=1,
+    color_mode='grayscale',
 )
 
 me_val_dataset = me_val_dataset.map(set_me_label)
@@ -68,6 +70,7 @@ notme_train_dataset = image_dataset_from_directory(
     validation_split=0.2,
     subset="training",
     seed=2,
+    color_mode='grayscale',
 )
 
 notme_train_dataset = notme_train_dataset.map(set_notme_label)
@@ -80,6 +83,7 @@ notme_val_dataset = image_dataset_from_directory(
     validation_split=0.2,
     subset="validation",
     seed=2,
+    color_mode='grayscale',
 )
 
 notme_val_dataset = notme_val_dataset.map(set_notme_label)
@@ -89,24 +93,21 @@ val_ds = me_val_dataset.concatenate(notme_val_dataset).shuffle(buffer_size=14)
 
 model = Sequential()
 
-# Rescaling Layer
-model.add(Rescaling(1./255))
-
 # First convolutional block
-model.add(Conv2D(32, (3, 3), activation='relu'))
+model.add(Conv2D(32, (3, 3), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Second convolutional block
-model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Third convolutional block
-model.add(Conv2D(128, (3, 3), activation='relu'))
+model.add(Conv2D(128, (3, 3), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Flatten the output and add dense layers
 model.add(Flatten())
-model.add(Dense(128, activation='relu'))
+model.add(Dense(128, activation='leaky_relu'))
 
 # Output layer (2 classes: 0 for "me", 1 for "not me")
 model.add(Dense(2, activation='softmax'))

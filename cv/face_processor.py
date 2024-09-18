@@ -7,7 +7,7 @@ def process_face(image, face_coords) -> int:
     x, y, w, h = face_coords
     face = image[y:y+h, x:x+w]
 
-    face_resized = cv2.resize(face, (224, 224))
+    face_resized = cv2.resize(cv2.cvtColor(face, cv2.COLOR_BGR2GRAY), (224, 224))
 
     face_array = np.array(face_resized)
 
