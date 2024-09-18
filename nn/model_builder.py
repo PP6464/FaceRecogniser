@@ -2,7 +2,7 @@ from typing import Callable
 
 import numpy as np
 from keras import Sequential
-from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D
+from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, RandomFlip
 from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
 
@@ -93,6 +93,9 @@ val_ds = me_val_dataset.concatenate(notme_val_dataset).shuffle(buffer_size=14)
 
 model = Sequential()
 
+# Randomly augment data whilst training
+model.add(RandomFlip())
+
 # First convolutional block
 model.add(Conv2D(32, (3, 3), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
@@ -114,7 +117,7 @@ model.add(Dense(2, activation='softmax'))
 
 model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
 
-model.fit(train_ds, validation_data=val_ds, epochs=10)
+model.fit(train_ds, validation_data=val_ds, epochs=15)
 
 loss, acc = model.evaluate(
     x=np.concatenate([x.numpy() for x, _ in val_ds]),
