@@ -3,7 +3,6 @@ from typing import Callable
 import numpy as np
 from keras import Sequential
 from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
-from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
 import tensorflow as tf
 
@@ -89,22 +88,31 @@ notme_val_dataset = image_dataset_from_directory(
 
 notme_val_dataset = notme_val_dataset.map(set_notme_label)
 
-train_ds = me_train_dataset.concatenate(notme_train_dataset).shuffle(buffer_size=56)
-val_ds = me_val_dataset.concatenate(notme_val_dataset).shuffle(buffer_size=14)
+train_ds = me_train_dataset.concatenate(notme_train_dataset)
+val_ds = me_val_dataset.concatenate(notme_val_dataset)
 
-# Also use the horizontally flipped images for training and testing (to test mirror images)
-
-
+# Also use the horizontally flipped images and zoomed in for training and testing (to test mirror and cropped images)
 def flip_image(image, label):
     flipped_img = tf.image.flip_left_right(image)
     return flipped_img, label
 
 
+def crop_image(image, label):
+    cropped_img = tf.image.central_crop(image, 0.9)
+    return tf.image.resize(cropped_img, (224, 224)), label
+
+
 train_ds_flipped = train_ds.map(flip_image)
 train_ds = train_ds.concatenate(train_ds_flipped)
+train_ds_zoomed = train_ds.map(crop_image)
+train_ds = train_ds.concatenate(train_ds_zoomed)
+train_ds = train_ds.shuffle(buffer_size=len(list(train_ds)))
 
 val_ds_flipped = val_ds.map(flip_image)
 val_ds = val_ds.concatenate(val_ds_flipped)
+val_ds_zoomed = val_ds.map(crop_image)
+val_ds.concatenate(val_ds_zoomed)
+val_ds = val_ds.shuffle(buffer_size=len(list(val_ds)))
 
 model = Sequential()
 
@@ -141,4 +149,7 @@ loss, acc = model.evaluate(
 
 print(f"Accuracy: {acc: .4f}")
 
-model.save("model/model.keras")
+save_model = input("Save model? (y/n) ")
+
+if save_model == "y":
+    model.save("model/model.keras")
