@@ -1,5 +1,3 @@
-from typing import Callable
-
 import numpy as np
 from keras import Sequential
 from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
