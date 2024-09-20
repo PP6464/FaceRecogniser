@@ -2,9 +2,10 @@ from typing import Callable
 
 import numpy as np
 from keras import Sequential
-from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, RandomFlip
+from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
 from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
+import tensorflow as tf
 
 
 # Query from a list using a list of indices
@@ -41,7 +42,7 @@ me_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.2,
+    validation_split=0.1,
     subset="training",
     seed=1,
     color_mode='grayscale',
@@ -54,7 +55,7 @@ me_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.2,
+    validation_split=0.1,
     subset="validation",
     seed=1,
     color_mode='grayscale',
@@ -67,7 +68,7 @@ notme_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.2,
+    validation_split=0.1,
     subset="training",
     seed=2,
     color_mode='grayscale',
@@ -80,7 +81,7 @@ notme_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.2,
+    validation_split=0.1,
     subset="validation",
     seed=2,
     color_mode='grayscale',
@@ -91,10 +92,24 @@ notme_val_dataset = notme_val_dataset.map(set_notme_label)
 train_ds = me_train_dataset.concatenate(notme_train_dataset).shuffle(buffer_size=56)
 val_ds = me_val_dataset.concatenate(notme_val_dataset).shuffle(buffer_size=14)
 
+# Also use the horizontally flipped images for training and testing (to test mirror images)
+
+
+def flip_image(image, label):
+    flipped_img = tf.image.flip_left_right(image)
+    return image, label
+
+
+train_ds_flipped = train_ds.map(flip_image)
+train_ds = train_ds.concatenate(train_ds_flipped)
+
+val_ds_flipped = val_ds.map(flip_image)
+val_ds = val_ds.concatenate(val_ds_flipped)
+
 model = Sequential()
 
-# Randomly augment data whilst training
-model.add(RandomFlip())
+# Rescaling
+model.add(Rescaling(1./255))
 
 # First convolutional block
 model.add(Conv2D(32, (3, 3), activation='leaky_relu'))
@@ -117,7 +132,7 @@ model.add(Dense(2, activation='softmax'))
 
 model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
 
-model.fit(train_ds, validation_data=val_ds, epochs=15)
+model.fit(train_ds, validation_data=val_ds, epochs=10)
 
 loss, acc = model.evaluate(
     x=np.concatenate([x.numpy() for x, _ in val_ds]),
@@ -126,10 +141,10 @@ loss, acc = model.evaluate(
 
 print(f"Accuracy: {acc: .4f}")
 
-saved_loss, saved_acc = load_model("model/model.keras").evaluate(
-    x=np.concatenate([x.numpy() for x, _ in val_ds]),
-    y=np.concatenate([y.numpy() for _, y in val_ds]),
-)
+# saved_loss, saved_acc = load_model("model/model.keras").evaluate(
+#     x=np.concatenate([x.numpy() for x, _ in val_ds]),
+    # y=np.concatenate([y.numpy() for _, y in val_ds]),
+# )
 
-if acc > saved_acc:
-    model.save("model/model.keras")
+# if acc > saved_acc:
+model.save("model/model.keras")
