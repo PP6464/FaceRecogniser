@@ -18,7 +18,7 @@ me_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.1,
+    validation_split=0.05,
     subset="training",
     seed=1,
     color_mode='grayscale',
@@ -31,7 +31,7 @@ me_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.1,
+    validation_split=0.05,
     subset="validation",
     seed=1,
     color_mode='grayscale',
@@ -44,7 +44,7 @@ notme_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.1,
+    validation_split=0.05,
     subset="training",
     seed=2,
     color_mode='grayscale',
@@ -57,7 +57,7 @@ notme_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.1,
+    validation_split=0.05,
     subset="validation",
     seed=2,
     color_mode='grayscale',
@@ -74,21 +74,12 @@ def flip_image(image, label):
     return flipped_img, label
 
 
-def crop_image(image, label):
-    cropped_img = tf.image.central_crop(image, 0.9)
-    return tf.image.resize(cropped_img, (224, 224)), label
-
-
 train_ds_flipped = train_ds.map(flip_image)
 train_ds = train_ds.concatenate(train_ds_flipped)
-train_ds_zoomed = train_ds.map(crop_image)
-train_ds = train_ds.concatenate(train_ds_zoomed)
 train_ds = train_ds.shuffle(buffer_size=len(list(train_ds)))
 
 val_ds_flipped = val_ds.map(flip_image)
 val_ds = val_ds.concatenate(val_ds_flipped)
-val_ds_zoomed = val_ds.map(crop_image)
-val_ds.concatenate(val_ds_zoomed)
 val_ds = val_ds.shuffle(buffer_size=len(list(val_ds)))
 
 model = Sequential()
