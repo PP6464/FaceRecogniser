@@ -97,7 +97,7 @@ val_ds = me_val_dataset.concatenate(notme_val_dataset).shuffle(buffer_size=14)
 
 def flip_image(image, label):
     flipped_img = tf.image.flip_left_right(image)
-    return image, label
+    return flipped_img, label
 
 
 train_ds_flipped = train_ds.map(flip_image)
@@ -141,10 +141,4 @@ loss, acc = model.evaluate(
 
 print(f"Accuracy: {acc: .4f}")
 
-saved_loss, saved_acc = load_model("model/model.keras").evaluate(
-    x=np.concatenate([x.numpy() for x, _ in val_ds]),
-    y=np.concatenate([y.numpy() for _, y in val_ds]),
-)
-
-if acc >= saved_acc:
-    model.save("model/model.keras")
+model.save("model/model.keras")
