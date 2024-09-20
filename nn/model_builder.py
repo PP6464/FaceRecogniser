@@ -7,27 +7,6 @@ from keras.src.utils import image_dataset_from_directory
 import tensorflow as tf
 
 
-# Query from a list using a list of indices
-def many_indices(_indices: list[int], _list: list) -> list:
-    res = []
-    for i in _indices:
-        res.append(_list[i])
-
-    return res
-
-
-# Conditionally partition a list (first list is elements for which condition is true)
-def conditional_partition(_condition: Callable, _list: list) -> tuple[list, list]:
-    res1 = []
-    res2 = []
-    for elem in _list:
-        if _condition(elem):
-            res1.append(elem)
-        else:
-            res2.append(elem)
-    return res1, res2
-
-
 def set_me_label(image, _):
     return image, np.array([0])
 
