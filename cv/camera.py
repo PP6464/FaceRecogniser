@@ -33,7 +33,7 @@ while True:
 
     for x, y, w, h in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)  # Draw a blue rect (it is in BGR) of thickness 2
-        prediction = process_face(frame, (x, y, w, h))
+        prediction = process_face(gray, (x, y, w, h))
         cv2.putText(
             frame,
             "Me" if prediction == 0 else "Not me",
