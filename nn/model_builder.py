@@ -101,7 +101,9 @@ model.add(MaxPooling2D((2, 2)))
 
 # Flatten the output and add dense layers
 model.add(Flatten())
-model.add(Dense(128, activation='leaky_relu'))
+
+model.add(Dense(64, activation='leaky_relu'))
+model.add(Dense(64, activation='leaky_relu'))
 
 # Output layer (2 classes: 0 for "me", 1 for "not me")
 model.add(Dense(2, activation='softmax'))
