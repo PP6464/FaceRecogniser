@@ -33,9 +33,9 @@ while True:
     for x, y, w, h in faces:
         # Normally the Haar Cascade detects just the face, not the surrounding hair etc.
         # The model has been trained with the face, hair and backgrounds in the data
-        # To compensate for this, we will need to enlarge the frame by around 10% in both directions about the centre
-        new_w = int(1.1 * w)
-        new_h = int(1.2 * h)
+        # To compensate for this, we will need to enlarge the frame in both directions about the centre
+        new_w = int(1.15 * w)
+        new_h = int(1.3 * h)
         new_x = int((x + w / 2) - new_w / 2)
         new_y = int((y + h / 2) - new_h / 2)
         if new_x < 0:
