@@ -1,6 +1,7 @@
 import numpy as np
 from keras import Sequential
 from keras.src.layers import Conv2D, Dense, Flatten, MaxPooling2D, Rescaling
+from keras.src.saving import load_model
 from keras.src.utils import image_dataset_from_directory
 import tensorflow as tf
 
@@ -15,7 +16,7 @@ def set_notme_label(image, _):
 
 me_train_dataset = image_dataset_from_directory(
     "data",
-    image_size=(224, 224),
+    image_size=(512, 512),
     batch_size=1,
     class_names=["me"],
     validation_split=0.1,
@@ -28,7 +29,7 @@ me_train_dataset = me_train_dataset.map(set_me_label)
 
 me_val_dataset = image_dataset_from_directory(
     "data",
-    image_size=(224, 224),
+    image_size=(512, 512),
     batch_size=1,
     class_names=["me"],
     validation_split=0.1,
@@ -41,7 +42,7 @@ me_val_dataset = me_val_dataset.map(set_me_label)
 
 notme_train_dataset = image_dataset_from_directory(
     "data",
-    image_size=(224, 224),
+    image_size=(512, 512),
     batch_size=1,
     class_names=["notme"],
     validation_split=0.1,
@@ -54,7 +55,7 @@ notme_train_dataset = notme_train_dataset.map(set_notme_label)
 
 notme_val_dataset = image_dataset_from_directory(
     "data",
-    image_size=(224, 224),
+    image_size=(512, 512),
     batch_size=1,
     class_names=["notme"],
     validation_split=0.1,
@@ -117,9 +118,25 @@ loss, acc = model.evaluate(
     y=np.concatenate([y.numpy() for _, y in val_ds]),
 )
 
-print(f"Accuracy: {acc: .4f}")
+# noinspection PyBroadException
+try:
+    saved_loss, saved_acc = load_model("model/model.keras").evaluate(
+        x=np.concatenate([x.numpy() for x, _ in val_ds]),
+        y=np.concatenate([y.numpy() for _, y in val_ds]),
+    )
+    print(f"Saved model accuracy: {saved_acc: .4f}")
 
-save_model = input("Save model? (y/n) ")
+    print(f"Accuracy: {acc: .4f}")
 
-if save_model == "y":
-    model.save("model/model.keras")
+    save_model = input("Save model? (y/n) ")
+
+    if save_model == "y":
+        model.save("model/model.keras")
+
+except Exception:
+    print(f"Accuracy: {acc: .4f}")
+
+    save_model = input("Save model? (y/n) ")
+
+    if save_model == "y":
+        model.save("model/model.keras")
