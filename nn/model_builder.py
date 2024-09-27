@@ -18,7 +18,7 @@ me_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.05,
+    validation_split=0.1,
     subset="training",
     seed=1,
     color_mode='grayscale',
@@ -31,7 +31,7 @@ me_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["me"],
-    validation_split=0.05,
+    validation_split=0.1,
     subset="validation",
     seed=1,
     color_mode='grayscale',
@@ -44,7 +44,7 @@ notme_train_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.05,
+    validation_split=0.1,
     subset="training",
     seed=2,
     color_mode='grayscale',
@@ -57,7 +57,7 @@ notme_val_dataset = image_dataset_from_directory(
     image_size=(224, 224),
     batch_size=1,
     class_names=["notme"],
-    validation_split=0.05,
+    validation_split=0.1,
     subset="validation",
     seed=2,
     color_mode='grayscale',
@@ -88,7 +88,7 @@ model = Sequential()
 model.add(Rescaling(1./255))
 
 # First convolutional block
-model.add(Conv2D(32, (3, 3), activation='leaky_relu'))
+model.add(Conv2D(32, (2, 2), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Second convolutional block
@@ -96,7 +96,7 @@ model.add(Conv2D(64, (3, 3), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Third convolutional block
-model.add(Conv2D(128, (3, 3), activation='leaky_relu'))
+model.add(Conv2D(128, (4, 4), activation='leaky_relu'))
 model.add(MaxPooling2D((2, 2)))
 
 # Flatten the output and add dense layers
