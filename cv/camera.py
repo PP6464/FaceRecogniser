@@ -16,7 +16,6 @@ if not cap.isOpened():
     print("Can't open camera")
     exit()
 
-
 # Continuously load frames from the camera
 while True:
     ret, frame = cap.read()
@@ -32,12 +31,28 @@ while True:
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     for x, y, w, h in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)  # Draw a blue rect (it is in BGR) of thickness 2
-        prediction = process_face(gray, (x, y, w, h))
+        # Normally the Haar Cascade detects just the face, not the surrounding hair etc.
+        # The model has been trained with the face, hair and backgrounds in the data
+        # To compensate for this, we will need to enlarge the frame by around 10% in both directions about the centre
+        new_w = int(1.1 * w)
+        new_h = int(1.2 * h)
+        new_x = int((x + w / 2) - new_w / 2)
+        new_y = int((y + h / 2) - new_h / 2)
+        if new_x < 0:
+            new_x = 0
+        if new_y < 0:
+            new_y = 0
+        if new_x > 1919:
+            new_x = 1919
+        if new_y > 1079:
+            new_y = 1079
+        # Draw a blue rect (it is in BGR) of thickness 2
+        cv2.rectangle(frame, (new_x, new_y), (new_x + new_w, new_y + new_h), (255, 0, 0), 2)
+        prediction = process_face(gray, (new_x, new_y, new_w, new_h))
         cv2.putText(
             frame,
             "Me" if prediction == 0 else "Not me",
-            (x, y-10),
+            (new_x, new_y - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.9,
             (0, 255, 0) if prediction == 0 else (0, 0, 255),
